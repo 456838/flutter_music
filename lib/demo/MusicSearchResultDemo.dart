@@ -13,14 +13,7 @@ class MusicSearchResultDemo extends StatelessWidget {
     ApplicationEvent.event = eventBus;
   }
 
-  final TextEditingController _controller =
-      new TextEditingController.fromValue(TextEditingValue(
-    // 设置内容
-    text: "生僻字",
-    // 保持光标在最后
-    selection: TextSelection.fromPosition(
-        TextPosition(affinity: TextAffinity.downstream, offset: "生僻字".length)),
-  ));
+  final TextEditingController _controller = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {

@@ -5,6 +5,7 @@ import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_music/MusicItem.dart';
 import 'package:flutter_music/event/event_bus.dart';
+import 'package:path_provider/path_provider.dart';
 
 class MusicSearchResultDemo extends StatelessWidget {
   final eventBus = new EventBus();
@@ -114,10 +115,28 @@ class SearchResultCardState extends State<SearchResultCard> {
   _downloadTask(Data item) async {
     print("[_downloadTask]");
     Dio dio = new Dio();
-    await dio.download(item.url, "./${item.name}-${item.singer}",
+    var dir = "${getExternalStorageDirectory()}/music/";
+    await dio.download(item.url, "/sdcard/${item.name}-${item.singer}.mp3",
         onProgress: (received, total) {
-          print("total:$total,received:$received");
-        });
+      print("total:$total,received:$received");
+    });
 //    dio.download("https://www.google.com/", "./xx.html");
+  }
+
+  localPath() async {
+    try {
+      var tempDir = await getTemporaryDirectory();
+      String tempPath = tempDir.path;
+
+      var appDocDir = await getApplicationDocumentsDirectory();
+      String appDocPath = appDocDir.path;
+
+      var dir = "${getExternalStorageDirectory()}/music/";
+
+      print('临时目录: ' + tempPath);
+      print('文档目录: ' + appDocPath);
+    } catch (err) {
+      print(err);
+    }
   }
 }

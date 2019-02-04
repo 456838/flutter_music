@@ -20,11 +20,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   dio: 2.0.0
-  fluttertoast: ^2.0.3
   json_annotation: ^0.2.3
   event_bus: ^1.0.1
   permission_handler: '^2.1.2'
   path_provider: ^0.4.1
+  fluttertoast: ^2.2.11
 dev_dependencies:
   flutter_test:
     sdk: flutter

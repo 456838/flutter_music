@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_music/MusicItem.dart';
 import 'package:flutter_music/event/event_bus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class MusicSearchResultDemo extends StatelessWidget {
   final eventBus = new EventBus();
@@ -73,6 +74,7 @@ class SearchResultCard extends StatefulWidget {
 
 class SearchResultCardState extends State<SearchResultCard> {
   List<Data> list = new List();
+  String downloadStatusText = "下载";
 
   SearchResultCardState() {}
 
@@ -103,11 +105,13 @@ class SearchResultCardState extends State<SearchResultCard> {
         title: new Text(data.name),
         subtitle: new Text(data.singer),
         trailing: MaterialButton(
-            child: new Text("下载"), onPressed: () => _downloadTask(data)));
+            child: new Text(downloadStatusText),
+            onPressed: () => _downloadTask(data)));
   }
 
   updateList(MusicItem item) {
     setState(() {
+      list.clear();
       list.addAll(item.data);
     });
   }
@@ -115,28 +119,26 @@ class SearchResultCardState extends State<SearchResultCard> {
   _downloadTask(Data item) async {
     print("[_downloadTask]");
     Dio dio = new Dio();
-    var dir = "${getExternalStorageDirectory()}/music/";
-    await dio.download(item.url, "/sdcard/${item.name}-${item.singer}.mp3",
-        onProgress: (received, total) {
+    var directory = new Directory("/sdcard/music/");
+    directory.createSync();
+    var savePath = directory.absolute.path + "${item.name}-${item.singer}.mp3";
+    await dio.download(item.url, savePath, onProgress: (received, total) {
       print("total:$total,received:$received");
+      var percent = received * 100 / total;
+      setState(() {
+        downloadStatusText = "$percent%";
+        if(percent==100){
+          downloadStatusText="下载完成";
+        }
+      });
+      Fluttertoast.showToast(
+          msg: "正在下载：$savePath",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIos: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
     });
-//    dio.download("https://www.google.com/", "./xx.html");
-  }
-
-  localPath() async {
-    try {
-      var tempDir = await getTemporaryDirectory();
-      String tempPath = tempDir.path;
-
-      var appDocDir = await getApplicationDocumentsDirectory();
-      String appDocPath = appDocDir.path;
-
-      var dir = "${getExternalStorageDirectory()}/music/";
-
-      print('临时目录: ' + tempPath);
-      print('文档目录: ' + appDocPath);
-    } catch (err) {
-      print(err);
-    }
   }
 }
